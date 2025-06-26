@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>『패권의 비밀』 30문제 퀴즈 게임</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+        }
+        .quiz-container {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease-in-out;
+        }
+        .answer-btn {
+            transition: all 0.2s ease-in-out;
+            border: 2px solid transparent;
+        }
+        .answer-btn:hover {
+            transform: translateY(-2px);
+            border-color: #60a5fa; /* A lighter blue for hover */
+        }
+        .correct {
+            background-color: #dcfce7 !important; /* Green-100 */
+            border-color: #22c55e !important; /* Green-500 */
+            color: #15803d; /* Green-700 */
+        }
+        .incorrect {
+            background-color: #fee2e2 !important; /* Red-100 */
+            border-color: #ef4444 !important; /* Red-500 */
+            color: #b91c1c; /* Red-700 */
+        }
+        .progress-bar-inner {
+            transition: width 0.4s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div id="quiz-app" class="quiz-container w-full max-w-3xl mx-auto p-6 md:p-8">
+        
+        <!-- Start Screen -->
+        <div id="start-screen">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 text-center mb-4">『패권의 비밀』 심화 퀴즈</h1>
+            <p class="text-gray-600 text-center mb-8">『패권의 비밀: 경제 체제와 전쟁의 관점에서 본 강대국의 흥망성쇠』에 대한 당신의 이해도를 테스트해보세요. 총 30문제가 준비되어 있습니다.</p>
+            <div class="text-center">
+                <button id="start-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors text-lg">퀴즈 시작하기</button>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden">
+            <div class="flex justify-between items-center mb-4">
+                <div id="progress-text" class="text-sm font-semibold text-gray-600"></div>
+                <div id="score-text" class="text-sm font-semibold text-blue-600"></div>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full progress-bar-inner" style="width: 0%"></div>
+            </div>
+
+            <h2 id="question-text" class="text-xl md:text-2xl font-bold text-gray-800 mb-6 min-h-[100px]"></h2>
+            <div id="answer-buttons" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Answer buttons will be inserted here by JavaScript -->
+            </div>
+            <div class="mt-8 text-right">
+                <button id="next-btn" class="bg-gray-800 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-900 transition-colors hidden">다음 문제</button>
+            </div>
+             <p id="hint-text" class="text-sm text-gray-500 mt-4 p-3 bg-gray-50 rounded-lg hidden"></p>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden text-center">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">퀴즈 결과</h1>
+            <p id="result-text" class="text-5xl font-bold text-blue-600 my-8"></p>
+            <p id="result-message" class="text-gray-600 mb-8"></p>
+            <button id="restart-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors text-lg">다시 시작하기</button>
+        </div>
+
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // All quiz questions and logic are contained within this script tag.
+
+    const questions = [
+        // From previous quiz (1-10)
+        {
+            question: "『패권의 비밀』에서 그람시의 패권 개념을 논할 때, '동의'를 구성하는 요소 중 경제적 보상 외에 특별히 강조되는 정신적 측면의 핵심은 무엇인가?",
+            hint: "진정한 패권은 물질적 이익 제공을 넘어 사람들의 마음과 생각을 이끄는 힘을 필요로 합니다.",
+            answers: [
+                { text: "압도적인 군사력을 통한 잠재적 위협의 각인", correct: false },
+                { text: "국제법 및 국제기구를 통한 규범적 질서의 확립", correct: false },
+                { text: "지적·도덕적 지도력과 이를 통한 피지배층의 자발적 승인 유도", correct: true },
+                { text: "세련된 고급 문화 전파를 통한 문화적 동경심 유발", correct: false },
+            ]
+        },
+        {
+            question: "『패권의 비밀』에 따르면, 스페인과 네덜란드가 각각 패권 쇠퇴기에 보인 '경로 의존성' 또는 '인식적 고착'의 구체적 양상으로 가장 적절하게 비교된 것은?",
+            hint: "두 국가는 과거의 성공 방식에 갇혀 새로운 시대의 변화에 효과적으로 대응하지 못했습니다.",
+            answers: [
+                { text: "스페인은 해상 무역 확대에, 네덜란드는 농업 생산력 강화에 실패했다.", correct: false },
+                { text: "스페인은 레콘키스타적 영토 확장 모델을 고수했고, 네덜란드는 기존 향료 중심의 상업 모델에서 벗어나지 못해 새로운 경제 환경 변화에 둔감했다.", correct: true },
+                { text: "스페인은 과도한 국내 산업 보호 정책을, 네덜란드는 식민지 직접 통치 강화를 추진했다.", correct: false },
+                { text: "스페인은 종교적 순수성 유지에 집착했고, 네덜란드는 금융 혁신의 초기 성공에만 안주했다.", correct: false },
+            ]
+        },
+        {
+            question: "『패권의 비밀』에서 산업 사회의 '확대 재생산' 메커니즘이 이전 사회의 성장 한계를 근본적으로 극복하는 핵심 동력은 무엇이라고 설명하는가?",
+            hint: "단순히 더 많이 생산하는 것을 넘어, 생산 방식 자체를 끊임없이 바꾸는 힘에 주목합니다.",
+            answers: [
+                { text: "정부 주도의 강력한 자원 배분 및 통제 시스템 구축", correct: false },
+                { text: "지속적인 기술 혁신에 기반한 신제품 개발과 새로운 수요 창출의 선순환", correct: true },
+                { text: "해외 식민지 확대를 통한 원료 공급처 및 상품 시장의 무한한 확보", correct: false },
+                { text: "인구 증가를 통한 노동력 공급 확대와 소비 시장의 양적 팽창", correct: false },
+            ]
+        },
+        {
+            question: "『패권의 비밀』은 영국 패권 쇠퇴의 한 원인으로 '초기 산업화 국가의 불리함(disadvantage of the first mover)'을 지적합니다. 이와 관련된 설명으로 가장 타당한 것은?",
+            hint: "가장 먼저 정상에 오른 자는 때로는 새로운 길을 찾는 데 뒤처질 수 있습니다.",
+            answers: [
+                { text: "초기 기술에 대한 과도한 투자로 인해 신기술 도입 시 전환 비용이 매우 커졌다.", correct: true },
+                { text: "자유 무역 체제를 너무 일찍 포기하여 국제 시장에서의 경쟁력을 상실했다.", correct: false },
+                { text: "식민지 착취에만 의존하여 본국의 산업 경쟁력 강화에 소홀했다.", correct: false },
+                { text: "경쟁국에 비해 너무 높은 수준의 노동자 복지 정책을 시행하여 기업 비용이 증가했다.", correct: false },
+            ]
+        },
+        {
+            question: "『패권의 비밀』에서 '불사조 효과'와 대조될 수 있는, 승전국이 오히려 패권 유지에 어려움을 겪거나 쇠퇴로 이어질 수 있는 상황을 암시하는 개념은 무엇인가?",
+            hint: "때로는 승리 자체가 새로운 부담과 문제를 야기할 수 있습니다.",
+            answers: [
+                { text: "'경로 의존성'", correct: false },
+                { text: "'패권적 부담(hegemonic burden)' 또는 '승자의 저주'", correct: true },
+                { text: "'단순 재생산 체제'", correct: false },
+                { text: "'인식적 고착'", correct: false },
+            ]
+        },
+        {
+            question: "『패권의 비밀』에서 네덜란드와 영국 쇠퇴의 공통적인 원인으로 지목되는 '금융화' 현상의 핵심적인 부정적 결과는 무엇인가?",
+            hint: "돈이 흘러가는 방향이 국가 경제의 실질적인 힘을 약화시켰습니다.",
+            answers: [
+                { text: "과도한 물가 상승으로 인한 국내 소비 시장 위축", correct: false },
+                { text: "정부의 재정 수입 감소로 인한 공공 서비스 질 저하", correct: false },
+                { text: "자본과 인재가 생산적인 산업 활동에서 이탈하여 국가의 실질적인 부 창출 능력 저하", correct: true },
+                { text: "국제 투기 자본의 급격한 유출입으로 인한 금융 시장 불안정 심화", correct: false },
+            ]
+        },
+        {
+            question: "『패권의 비밀』에서 미국이 제2차 세계대전 이후 '글로벌 확대 재생산 시스템'을 구축하는 데 있어 핵심적인 역할을 한 국제 경제 질서의 예시로 가장 적절한 것은?",
+            hint: "전후 세계 경제의 규칙과 틀을 만드는 데 주도적인 역할을 했습니다.",
+            answers: [
+                { text: "바르샤바 조약 기구 창설", correct: false },
+                { text: "브레튼우즈 체제와 GATT(관세 및 무역에 관한 일반 협정)", correct: true },
+                { text: "비동맹 운동의 확산 지원", correct: false },
+                { text: "석유수출국기구(OPEC) 결성 주도", correct: false },
+            ]
+        },
+        {
+            question: "『패권의 비밀』은 패권 유지를 위한 '국내적 사회 통합과 동의'의 중요성을 언급합니다. 이것이 패권 국가의 대외적 영향력과 어떻게 연결된다고 볼 수 있는가?",
+            hint: "내부적으로 튼튼해야 외부적으로도 강한 힘을 발휘할 수 있습니다.",
+            answers: [
+                { text: "국내 통합은 국제 사회에서 고립을 자초하여 패권 유지에 불리하다.", correct: false },
+                { text: "국내 사회가 안정되고 경제적 잉여가 공정하게 분배될 때, 국가 자원의 효율적 동원과 대외 정책에 대한 국민적 지지가 강화된다.", correct: true },
+                { text: "국내적 동의가 강할수록 다른 국가들이 해당 패권국의 내부 문제에 개입하기 어려워진다.", correct: false },
+                { text: "국내 사회 통합은 필연적으로 국수주의를 강화시켜 국제적 협력을 저해한다.", correct: false },
+            ]
+        },
+        {
+            question: "『패권의 비밀』의 저자들이 현대 미국 경제에 대해 경고하는 '과거 패권국들의 쇠퇴 경로와 유사한 경향'이란 구체적으로 어떤 경제적 현상을 지칭하는가?",
+            hint: "역사는 반복된다는 말이 있듯이, 이전 강대국들이 걸었던 길을 미국도 따라갈 수 있다는 우려입니다.",
+            answers: [
+                { text: "급격한 산업화로 인한 환경오염 문제 심화", correct: false },
+                { text: "제조업 공동화 및 자본의 비생산적 영역(예: 금융, 부동산)으로의 과도한 집중", correct: true },
+                { text: "높은 수준의 기술 발전에 따른 노동 시장의 양극화 심화", correct: false },
+                { text: "과도한 보호무역주의 정책으로 인한 국제 교역 질서 교란", correct: false },
+            ]
+        },
+        {
+            question: "『패권의 비밀』에서 궁극적으로 제안하는 '지속적인 경제 성장이 약속하는 번영을 누릴 수 있는 새로운 길'을 모색하기 위한 전제 조건으로 가장 강조되는 것은 무엇인가?",
+            hint: "단순히 과거를 답습하거나 외형적 성장에만 치중하는 것을 넘어, 국가 발전의 본질에 대한 깊은 성찰이 필요합니다.",
+            answers: [
+                { text: "군사적 패권을 통한 세계 질서의 안정적 유지", correct: false },
+                { text: "국가의 역할 축소와 완전한 시장 자율에 기반한 경제 운영", correct: false },
+                { text: "경제 발전 메커니즘에 대한 깊이 있는 이해와 이를 바탕으로 한 '의식적 선택' 및 '올바른 정책' 수립", correct: true },
+                { text: "국제 기구를 통한 전 지구적 자원 재분배 시스템 구축", correct: false },
+            ]
+        },
+        // Newly generated questions (11-30)
+        {
+            question: "책의 서론에서 저자들이 역사 연구를 '실험실'에 비유하는 이유는 무엇인가?",
+            hint: "이론은 현실 세계의 검증을 거쳐야 그 가치가 증명됩니다.",
+            answers: [
+                { text: "역사적 사건을 통제된 환경에서 재현할 수 있기 때문에", correct: false },
+                { text: "자신들이 세운 경제 성장 이론을 실제 역사적 사례를 통해 검증하기 위해", correct: true },
+                { text: "미래를 정확하게 예측하는 공식을 만들기 위해", correct: false },
+                { text: "역사 연구가 경제 이론보다 우월함을 증명하기 위해", correct: false },
+            ]
+        },
+        {
+            question: "저자들이 '감속 성장'과 '가속 성장'이라는 질적 차이로 경제 사회를 구분하는 주된 목적은 무엇인가?",
+            hint: "국가의 장기적인 운명을 결정하는 것은 그 사회의 'DNA'에 달려있다고 봅니다.",
+            answers: [
+                { text: "단순히 경제 발전 단계를 나열하기 위해", correct: false },
+                { text: "각 사회의 장기적인 발전 경로와 잠재력을 근본적으로 이해하기 위해", correct: true },
+                { text: "특정 사회가 다른 사회보다 도덕적으로 우월함을 보이기 위해", correct: false },
+                { text: "농업 사회의 중요성을 다시 강조하기 위해", correct: false },
+            ]
+        },
+        {
+            question: "농업 사회에서 '경제와 전쟁의 선순환'이 일어나기 어려운 근본적인 이유는 무엇인가?",
+            hint: "전쟁에서 이겨 땅을 얻어도, 그 땅에서 나는 수확물에는 한계가 있습니다.",
+            answers: [
+                { text: "농업 사회는 전쟁 기술이 발달하지 않았기 때문에", correct: false },
+                { text: "정복 전쟁의 성격이 부를 창출하기보다 이전시키는 제로섬 게임에 가깝고, 경제 자체가 감속 성장 체제이기 때문에", correct: true },
+                { text: "농민들이 전쟁에 참여하는 것을 꺼렸기 때문에", correct: false },
+                { text: "농업 사회의 지도자들은 전쟁보다 평화를 선호했기 때문에", correct: false },
+            ]
+        },
+        {
+            question: "17세기 네덜란드의 동인도회사(VOC)는 어떤 점에서 '확대 재투자' 시스템의 정점을 보여주는가?",
+            hint: "단순한 무역 회사를 넘어, 여러 기능을 하나로 합친 강력한 조직이었습니다.",
+            answers: [
+                { text: "주주들에게 높은 배당금을 지급했기 때문에", correct: false },
+                { text: "무역, 금융, 군사력을 결합하여 얻은 막대한 이윤을 다시 상업 활동 확대에 투자했기 때문에", correct: true },
+                { text: "최초로 주식을 발행한 회사이기 때문에", correct: false },
+                { text: "정부로부터 완전히 독립하여 운영되었기 때문에", correct: false },
+            ]
+        },
+        {
+            question: "책의 분석에 따르면, 17세기 영국이 네덜란드를 상대로 경쟁 우위를 점할 수 있었던 제도적 요인은 무엇인가?",
+            hint: "영국은 돈을 걷고 군대를 운영하는 국가 시스템을 더 효율적으로 만들었습니다.",
+            answers: [
+                { text: "더 강력한 왕권을 바탕으로 한 신속한 의사결정", correct: false },
+                { text: "명예혁명 이후 안정된 '재정-군사 국가' 체제 확립", correct: true },
+                { text: "네덜란드보다 뛰어난 상업적 창의성", correct: false },
+                { text: "프랑스와의 군사 동맹 체결", correct: false },
+            ]
+        },
+        {
+            question: "미국의 '내부 식민지' 개념은 영국 패권 모델과 비교할 때 어떤 차이점을 시사하는가?",
+            hint: "영국은 바다 건너에서 자원과 시장을 찾았지만, 미국은 자국 영토 안에서 그 역할을 수행했습니다.",
+            answers: [
+                { text: "미국은 식민지가 전혀 필요 없었다는 점", correct: false },
+                { text: "미국은 주로 자국 영토 내(남부, 서부)의 팽창을 통해 산업화에 필요한 자원과 시장을 확보했다는 점", correct: true },
+                { text: "미국의 식민지 경영 방식이 영국보다 더 인도적이었다는 점", correct: false },
+                { text: "미국은 영국과 달리 농업 생산물에만 의존했다는 점", correct: false },
+            ]
+        },
+        {
+            question: "19세기 미국 남북전쟁이 패권 국가로의 성장에 미친 가장 중요한 영향은 무엇인가?",
+            hint: "전쟁의 결과로 미국 경제의 주도권이 한쪽으로 완전히 기울었습니다.",
+            answers: [
+                { text: "노예 해방을 통해 인권 수준을 높인 것", correct: false },
+                { text: "산업화된 북부가 농업 기반의 남부를 압도하며 통일된 산업 국가 경제의 기틀을 마련한 것", correct:true },
+                { text: "전쟁 과정에서 새로운 무기 기술이 발전한 것", correct: false },
+                { text: "전쟁 후 남부 재건 사업을 통해 큰 경제적 이득을 얻은 것", correct: false },
+            ]
+        },
+        {
+            question: "저자들이 '복고주의' 경향을 비판하는 이유는 무엇인가?",
+            hint: "과거의 낭만적인 모습에 기대어 현재의 복잡한 문제를 해결할 수는 없다는 것입니다.",
+            answers: [
+                { text: "역사 연구가 무의미하다고 생각하기 때문에", correct: false },
+                { text: "현대 사회의 문제를 이미 소멸한 과거(특히 농업 사회)의 '지혜'에서 찾으려는 시도가 비현실적이고 위험하기 때문에", correct: true },
+                { text: "전통문화를 경시하기 때문에", correct: false },
+                { text: "모든 종류의 과거 회귀를 부정하기 때문에", correct: false },
+            ]
+        },
+        {
+            question: "저자들이 '제국(empire)'을 \"구조적으로 확장 지향적인 성향을 가진 국가\"로 정의하는 것은 어떤 의미를 내포하는가?",
+            hint: "제국은 현재 상태에 만족하지 않고 끊임없이 밖으로 뻗어 나가려는 본성을 가집니다.",
+            answers: [
+                { text: "모든 제국은 본질적으로 사악하다는 의미", correct: false },
+                { text: "제국은 정체 상태를 유지할 수 없으며, 경제적·정치적 필요에 의해 팽창을 추구하는 동력을 내재하고 있다는 의미", correct: true },
+                { text: "제국은 오직 군사적 정복을 통해서만 유지될 수 있다는 의미", correct: false },
+                { text: "오직 산업 사회만이 진정한 제국이 될 수 있다는 의미", correct: false },
+            ]
+        },
+        {
+            question: "책에서 언급된 19세기 영국 '신사적 자본가' 현상이 현대에 시사하는 바는 무엇인가?",
+            hint: "한 나라의 엘리트들이 어떤 분야를 선호하는지가 국가 경제의 미래를 좌우할 수 있습니다.",
+            answers: [
+                { text: "모든 국가는 금융업을 최우선으로 육성해야 한다.", correct: false },
+                { text: "국가의 핵심 인재와 자본이 실질적인 부를 창출하는 생산 부문에서 이탈할 때 국가 경쟁력이 약화될 수 있다.", correct: true },
+                { text: "제조업은 더 이상 중요하지 않다.", correct: false },
+                { text: "신사적인 태도가 기업 경영에 필수적이다.", correct: false },
+            ]
+        },
+        {
+            question: "저자들이 학제 간 연구(특히 경제사와 경제 이론의 융합)의 중요성을 강조하는 이유는?",
+            hint: "하나의 렌즈만으로는 복잡한 세상을 온전히 볼 수 없습니다.",
+            answers: [
+                { text: "역사학이 경제학보다 더 우월한 학문이기 때문에", correct: false },
+                { text: "복잡한 사회 현상을 단일 학문의 관점으로만 분석하는 데는 한계가 있기 때문에", correct: true },
+                { text: "경제학자들이 역사에 대한 지식이 부족하기 때문에", correct: false },
+                { text: "연구 자금을 더 많이 확보하기 위해", correct: false },
+            ]
+        },
+        {
+            question: "책의 관점에서 볼 때, 패권국의 '동의'를 얻는 능력이 약화되는 징후로 볼 수 있는 것은?",
+            hint: "따르던 국가들이 더 이상 리더의 방식을 신뢰하지 않거나 다른 대안을 찾기 시작합니다.",
+            answers: [
+                { text: "군사비 지출 증가", correct: false },
+                { text: "동맹국들이 패권국의 경제 정책을 비판하고 독자적인 노선을 추구하려는 움직임", correct: true },
+                { text: "패권국 내부의 정치적 안정 강화", correct: false },
+                { text: "패권국의 문화 상품 수출 증가", correct: false },
+            ]
+        },
+        {
+            question: "산업 사회에서 '경제와 전쟁의 선순환'이 이전 사회보다 훨씬 더 강력한 파급력을 갖는 이유는?",
+            hint: "전쟁이 산업 생산 능력을 폭발적으로 증가시키는 계기가 될 수 있습니다.",
+            answers: [
+                { text: "전쟁이 항상 새로운 기술 발전을 가져오기 때문에", correct: false },
+                { text: "총력전 체제 하에서 국가의 산업 생산력이 극대화되고, 이것이 다시 군사력 강화와 경제적 이익으로 연결되기 때문에", correct: true },
+                { text: "산업 사회의 군인들이 더 용감하기 때문에", correct: false },
+                { text: "산업 사회는 전쟁을 통해 인구 문제를 해결하기 때문에", correct: false },
+            ]
+        },
+        {
+            question: "스페인의 '복합 왕국' 체제가 패권 유지에 장기적으로 불리하게 작용한 이유는 무엇인가?",
+            hint: "여러 조각을 느슨하게 붙여놓은 것과 같아서, 하나의 강력한 힘을 내기 어려웠습니다.",
+            answers: [
+                { text: "다양한 문화를 존중하는 선진적인 체제였기 때문에", correct: false },
+                { text: "중앙집권적인 재정 통제와 심층적인 경제 통합을 어렵게 만들어 국가 역량을 결집하는 데 한계가 있었기 때문에", correct: true },
+                { text: "지방 귀족들의 반란이 끊이지 않았기 때문에", correct: false },
+                { text: "왕의 권위가 너무 약했기 때문에", correct: false },
+            ]
+        },
+        {
+            question: "네덜란드 쇠퇴의 원인 중 하나인 '신규 고부가가치 상품 발굴 실패'는 상업 사회의 어떤 본질적 한계를 보여주는가?",
+            hint: "물건을 거래하는 능력과 새로운 물건을 만들어내는 능력은 다릅니다.",
+            answers: [
+                { text: "무역 네트워크 관리 능력의 한계", correct: false },
+                { text: "생산 자체의 기술 혁신 능력이 부족하여 기존의 성공 모델에 안주하게 되는 한계", correct: true },
+                { text: "해외 시장 정보 수집 능력의 한계", correct: false },
+                { text: "금융 자본 동원 능력의 한계", correct: false },
+            ]
+        },
+        {
+            question: "영국의 '항해법'은 어떤 경제 정책의 전형적인 예시인가?",
+            hint: "자유로운 경쟁보다는 자국의 이익을 우선시하는 정책입니다.",
+            answers: [
+                { text: "자유방임주의", correct: false },
+                { text: "중상주의", correct: true },
+                { text: "사회주의", correct: false },
+                { text: "고립주의", correct: false },
+            ]
+        },
+        {
+            question: "미국 남북전쟁 이전, 남부와 북부의 경제 시스템은 각각 어떤 사회 모델에 더 가까웠는가?",
+            hint: "한쪽은 농장주와 노예, 다른 한쪽은 공장주와 노동자가 중심이었습니다.",
+            answers: [
+                { text: "남부: 산업 사회 / 북부: 상업 사회", correct: false },
+                { text: "남부: 농업 사회 / 북부: 산업 사회", correct: true },
+                { text: "남부: 상업 사회 / 북부: 농업 사회", correct: false },
+                { text: "양쪽 모두 산업 사회", correct: false },
+            ]
+        },
+        {
+            question: "대공황에 대한 저자들의 분석은 무엇을 시사하는가?",
+            hint: "물건을 만들어내는 능력은 엄청나게 커졌지만, 그것을 소화할 시장이 부족했습니다.",
+            answers: [
+                { text: "순전히 주식 시장의 거품 붕괴 때문에 발생했다.", correct: false },
+                { text: "미국의 생산 능력이 국내외 수요를 초과했으며, 이를 조율할 새로운 국제 분업 체계가 부재했기 때문에 발생했다.", correct: true },
+                { text: "유럽 국가들의 경제 회복이 너무 더뎠기 때문에 발생했다.", correct: false },
+                { text: "정부의 과도한 시장 개입 때문에 발생했다.", correct: false },
+            ]
+        },
+        {
+            question: "저자들이 '지속적인 경제 성장이 약속하는 번영'을 이야기할 때, 그 성장의 질적 조건으로 가장 중요하게 생각하는 것은?",
+            hint: "단순히 양이 늘어나는 것만으로는 진정한 번영이 아닙니다.",
+            answers: [
+                { text: "환경 파괴를 최소화하는 성장", correct: false },
+                { text: "기술 혁신에 기반한 생산성 향상을 동반하는 '가속 성장'", correct: true },
+                { text: "수출 대기업 중심의 성장", correct: false },
+                { text: "모든 국민에게 동일한 부를 분배하는 성장", correct: false },
+            ]
+        }
+    ];
+
+    const startScreen = document.getElementById('start-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultScreen = document.getElementById('result-screen');
+
+    const startBtn = document.getElementById('start-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const restartBtn = document.getElementById('restart-btn');
+
+    const questionText = document.getElementById('question-text');
+    const answerButtons = document.getElementById('answer-buttons');
+    const progressText = document.getElementById('progress-text');
+    const progressBar = document.getElementById('progress-bar');
+    const scoreText = document.getElementById('score-text');
+    const hintText = document.getElementById('hint-text');
+    const resultText = document.getElementById('result-text');
+    const resultMessage = document.getElementById('result-message');
+
+
+    let shuffledQuestions, currentQuestionIndex;
+    let score = 0;
+
+    function startGame() {
+        startScreen.classList.add('hidden');
+        resultScreen.classList.add('hidden');
+        quizScreen.classList.remove('hidden');
+        
+        // Shuffle questions for a new experience each time
+        shuffledQuestions = questions.sort(() => Math.random() - 0.5);
+        currentQuestionIndex = 0;
+        score = 0;
+        scoreText.innerText = `점수: ${score}`;
+        nextBtn.classList.add('hidden');
+        setNextQuestion();
+    }
+
+    function setNextQuestion() {
+        resetState();
+        if (currentQuestionIndex < shuffledQuestions.length) {
+            showQuestion(shuffledQuestions[currentQuestionIndex]);
+        } else {
+            showResult();
+        }
+    }
+
+    function showQuestion(question) {
+        questionText.innerText = question.question;
+        
+        // Update progress
+        const questionNumber = currentQuestionIndex + 1;
+        progressText.innerText = `문제 ${questionNumber} / ${shuffledQuestions.length}`;
+        progressBar.style.width = `${(questionNumber / shuffledQuestions.length) * 100}%`;
+
+        // Create answer buttons
+        question.answers.forEach(answer => {
+            const button = document.createElement('button');
+            button.innerText = answer.text;
+            button.classList.add('answer-btn', 'w-full', 'p-4', 'text-left', 'bg-gray-100', 'rounded-lg', 'hover:bg-blue-100', 'border-2', 'border-gray-200');
+            if (answer.correct) {
+                button.dataset.correct = answer.correct;
+            }
+            button.addEventListener('click', selectAnswer);
+            answerButtons.appendChild(button);
+        });
+
+        // Show hint
+        if (question.hint) {
+            hintText.innerText = `💡 힌트: ${question.hint}`;
+            hintText.classList.remove('hidden');
+        }
+    }
+
+    function resetState() {
+        nextBtn.classList.add('hidden');
+        hintText.classList.add('hidden');
+        while (answerButtons.firstChild) {
+            answerButtons.removeChild(answerButtons.firstChild);
+        }
+    }
+
+    function selectAnswer(e) {
+        const selectedBtn = e.target;
+        const correct = selectedBtn.dataset.correct === "true";
+
+        if (correct) {
+            score++;
+            scoreText.innerText = `점수: ${score}`;
+        }
+
+        Array.from(answerButtons.children).forEach(button => {
+            setStatusClass(button, button.dataset.correct === "true");
+            button.disabled = true; // Disable all buttons after an answer is selected
+        });
+        
+        nextBtn.classList.remove('hidden');
+        currentQuestionIndex++;
+    }
+
+    function setStatusClass(element, correct) {
+        clearStatusClass(element);
+        if (correct) {
+            element.classList.add('correct');
+        } else {
+            element.classList.add('incorrect');
+        }
+    }
+
+    function clearStatusClass(element) {
+        element.classList.remove('correct');
+        element.classList.remove('incorrect');
+    }
+
+    function showResult() {
+        quizScreen.classList.add('hidden');
+        resultScreen.classList.remove('hidden');
+        const finalScore = `${score} / ${shuffledQuestions.length}`;
+        resultText.innerText = finalScore;
+        
+        const percentage = (score / shuffledQuestions.length) * 100;
+        let message = "";
+        if (percentage >= 90) {
+            message = "정말 대단합니다! 『패권의 비밀』을 완벽하게 이해하고 계시는군요.";
+        } else if (percentage >= 70) {
+            message = "훌륭합니다! 핵심 내용을 잘 파악하고 계십니다.";
+        } else if (percentage >= 50) {
+            message = "좋은 시도였습니다! 조금 더 복습하면 완벽해질 거예요.";
+        } else {
+            message = "수고하셨습니다. 다시 한번 도전해서 개념을 다져보세요!";
+        }
+        resultMessage.innerText = message;
+    }
+
+    startBtn.addEventListener('click', startGame);
+    nextBtn.addEventListener('click', setNextQuestion);
+    restartBtn.addEventListener('click', startGame);
+});
+</script>
+</body>
+</html>
